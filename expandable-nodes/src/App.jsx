@@ -3,6 +3,7 @@ import './App.css'
 import ForceGraph3D from 'react-force-graph-3d';
 import ForceGraph2D from "react-force-graph-2d";
 import myData from './submitOrder.json'
+import FullGraphFunction from './components/FullGraphFunction';
 
 function genRandomTree(N = 300, reverse = false) {
  
@@ -21,7 +22,10 @@ console.log(node_graph)
 //   nodes: [
 //     { id: "0",
 //       name: "getBillerIdBySoloId",
-//       val: 5
+//       val: 5,
+//       success: "98",
+//       rec_count: "78090",
+//       exec_time: "234"
 //      }, // Root node
 //     {
 //       id: "1",
@@ -60,7 +64,7 @@ const GraphData = myData
 
 const ExpandableGraph = ({ graphData }) => {
   const rootId = 0;
-
+  
   const nodesById = useMemo(() => {
     const nodesById = Object.fromEntries(graphData.nodes.map(node => [node.id, node]));
 
@@ -69,9 +73,7 @@ const ExpandableGraph = ({ graphData }) => {
       node.collapsed = node.id !== rootId;
       node.childLinks = [];
     });
-
     graphData.links.forEach(link => nodesById[link.source].childLinks.push(link));
-
     return nodesById;
   }, [graphData]);
 
@@ -92,11 +94,48 @@ const ExpandableGraph = ({ graphData }) => {
 
   const [prunedTree, setPrunedTree] = useState(getPrunedTree());
 
+
   const handleNodeClick = useCallback(node => {
     node.collapsed = !node.collapsed; // toggle collapse state
     setPrunedTree(getPrunedTree())
   }, []);
 
+
+  // Tooltip
+  const [hoveredNode, setHoveredNode] = useState(null);
+
+  const handleNodeHover = useCallback(
+    (node) => {
+      setHoveredNode(node || null);
+    },
+    [setHoveredNode]
+  );
+
+  const renderTooltip = useCallback(() => {
+    if (!hoveredNode) return null;
+
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          padding: '8px',
+          borderRadius: '4px',
+          zIndex: 1,
+          left: '50%',
+          top: '90%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <p>{hoveredNode.name}</p>
+        <p>Success Rate: {hoveredNode.success}% </p>
+        <p>Transaction Count: {hoveredNode.rec_count} (15min avg)</p>
+        <p>Avg Exec Time: {hoveredNode.exec_time} ms</p>
+      </div>
+    );
+  }, [hoveredNode]);
+  
   // Changing link distance
   const handleGraphRef = (graph) => {
     if (graph) {
@@ -109,13 +148,16 @@ const ExpandableGraph = ({ graphData }) => {
     }
   };
 
-  return <ForceGraph2D
+  return (
+  <div style={{ position: 'relative' }}>
+  <ForceGraph2D
     graphData={prunedTree}
     ref={handleGraphRef}
     linkDirectionalParticles={2}
     backgroundColor="lightgray"
     nodeColor={node => !node.childLinks.length ? 'green' : node.collapsed ? 'red' : 'yellow'}
     onNodeClick={handleNodeClick}
+    onNodeHover={handleNodeHover}
     nodeCanvasObjectMode={() => "after"}
     nodeCanvasObject={(node, ctx, globalScale) => {
       const label = node.name;
@@ -131,31 +173,36 @@ const ExpandableGraph = ({ graphData }) => {
       }
     }}
     
-  />;
+  />
+  {renderTooltip()}
+    </div>
+  );
 };
 
-// function MyComponent() {
-//   const handleClick = () => {
-//     <ForceGraph2D
-//     graphData={GraphData} />;
-//   };
-
-//   return (
-//     <button onClick={handleClick}>
-//       Expand Entire Graph
-//     </button>
-//   );
-// };
 
 
 function App() {
-  
-  return (
-    <>
+  const [myBool, setmyBool] = useState(true);
 
-      <ExpandableGraph graphData={GraphData}/>
-    </>
+  function toggleBool() {
+    setmyBool(!myBool)
+  }
+
+  return (
+    myBool ? <ExpandableGraphFunction toggleBool={toggleBool} /> : <FullGraphFunction toggleBool={toggleBool} graphData={GraphData} /> 
+  );
+}
+
+function ExpandableGraphFunction(props){
+  return (
+    <div>
+      <ExpandableGraph graphData={GraphData} />
+      <button onClick={props.toggleBool}>Expandable/Full</button>
+      <p>Blue Indicates terminal node, Red expandable node, Tan expanded node</p>
+    </div>
   )
 }
+
+
 
 export default App
