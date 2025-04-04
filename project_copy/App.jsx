@@ -3,6 +3,7 @@ import './App.css'
 import ForceGraph3D from 'react-force-graph-3d';
 import ForceGraph2D from "react-force-graph-2d";
 import myData from './submitOrder.json'
+import FullGraphFunction from './components/FullGraphFunction';
 
 function genRandomTree(N = 300, reverse = false) {
  
@@ -61,7 +62,7 @@ console.log(node_graph)
 const GraphData = myData
 
 
-const ExpandableGraph = ({ graphData,fullGraph }) => {
+const ExpandableGraph = ({ graphData }) => {
   const rootId = 0;
   
   const nodesById = useMemo(() => {
@@ -147,38 +148,6 @@ const ExpandableGraph = ({ graphData,fullGraph }) => {
     }
   };
 
-  if (fullGraph == "True") {
-    return (
-      <div style={{ position: 'relative' }}>
-      <ForceGraph2D
-        graphData={graphData}
-        ref={handleGraphRef}
-        linkDirectionalParticles={2}
-        backgroundColor="lightgray"
-        nodeColor={node => !node.childLinks.length ? 'green' : node.collapsed ? 'red' : 'yellow'}
-        onNodeClick={handleNodeClick}
-        onNodeHover={handleNodeHover}
-        nodeCanvasObjectMode={() => "after"}
-        nodeCanvasObject={(node, ctx, globalScale) => {
-          const label = node.name;
-          const fontSize = 12 / globalScale;
-          ctx.font = `${fontSize}px Sans-Serif`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = "black"; //node.color;
-          if (node.isClusterNode) {
-            ctx.fillText(label, node.x, node.y);
-          } else {
-            ctx.fillText(label, node.x + 20, node.y);
-          }
-        }}
-        
-      />
-      {renderTooltip()}
-        </div>
-      );
-  }
-
   return (
   <div style={{ position: 'relative' }}>
   <ForceGraph2D
@@ -212,25 +181,27 @@ const ExpandableGraph = ({ graphData,fullGraph }) => {
 
 
 
-
 function App() {
-  const [showA, setShowA] = useState(true);
+  const [myBool, setmyBool] = useState(true);
 
-  const toggleComponent = () => {
-    setShowA(!showA);
-  };
+  function toggleBool() {
+    setmyBool(!myBool)
+  }
 
   return (
-    <div>
-      
-      {showA ?  <ExpandableGraph graphData={GraphData} fullGraph={"False"}/> : <ExpandableGraph graphData={GraphData} fullGraph={"True"}/>}
-      <button onClick={toggleComponent}>
-        Switch to {showA ? 'Expanded' : 'Collapsed'}
-      </button>
-    </div>
+    myBool ? <ExpandableGraphFunction toggleBool={toggleBool} /> : <FullGraphFunction toggleBool={toggleBool} graphData={GraphData} /> 
   );
 }
 
+function ExpandableGraphFunction(props){
+  return (
+    <div>
+      <ExpandableGraph graphData={GraphData} />
+      <button onClick={props.toggleBool}>Expandable/Full</button>
+      <p>Blue Indicates terminal node, Red expandable node, Tan expanded node</p>
+    </div>
+  )
+}
 
 
 
