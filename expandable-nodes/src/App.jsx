@@ -1,40 +1,29 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React from 'react';
 import './App.css'
-import ForceGraph3D from 'react-force-graph-3d';
-import ForceGraph2D from "react-force-graph-2d";
-import DropDown from './components/DropDown'
 import GraphFunction from './components/GraphFunction'
 
-import SubmitOrderData from './data/submitOrder.json'
-import CancelOrderData from './data/cancelOrder.json'
-import cancelTransferOrderData from './data/cancelTransferOrder.json'
-import disconnectAccount_V2Data from './data/disconnectAccount_V2.json'
-
-let GraphDataMap = new Map();
-GraphDataMap.set("submitOrder",SubmitOrderData)
-GraphDataMap.set("cancelOrder", CancelOrderData)
-GraphDataMap.set("cancelTransferOrder", cancelTransferOrderData)
-GraphDataMap.set("disconnectAccount_V2", disconnectAccount_V2Data)
-
 function App() {
-  const [message, setMessage] = useState('disconnectAccount_V2');
-  const [GraphData, setGraphData] = useState(GraphDataMap.get(message));
 
-  const updateMessage = (newMessage) => {
-    setMessage(newMessage);
-    setGraphData(GraphDataMap.get(newMessage))
-  };
-  
-  
+
+
+
+
   return (
-    <div>
-      <GraphFunction GraphData={message} />  
-      <h1>{message}</h1>
-      <DropDown updateMessage={updateMessage} />
+    <div >
+    <div  style={{ backgroundColor:  'white',height:'100vw'}}  >
+      <GraphFunction />
+      <div className='container' >
+
+      </div>
+      <p style={{textAlign: "center"}}>Service relationships are defined by documentation below.
+        Services not included in documentation relationships are predicted according to time and frequency they are called following other services </p>
+      <p style={{textAlign: "center"}}>https://chalk.charter.com/display/OIS/COOL</p>
+
+    </div>
     </div>
   );
 }
 
 export default App
 
-// 
+//

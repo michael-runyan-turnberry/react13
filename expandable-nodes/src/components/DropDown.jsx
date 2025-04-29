@@ -15,7 +15,7 @@ export default function BasicSelect({ updateMessage }) {
   };
 
   return (
-    <Box sx={{ minWidth: 120 }}>
+    <Box sx={{ minWidth: 250 }}>
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Service</InputLabel>
         <Select
@@ -25,8 +25,13 @@ export default function BasicSelect({ updateMessage }) {
           label="Age"
           onChange={handleChange}
         >
-          <MenuItem value={"submitOrder"}>submitOrder</MenuItem>
-          <MenuItem value={"cancelOrder"}>cancelOrder</MenuItem>
+          <MenuItem value={"SubmitOrder_V2"}>SubmitOrder_V2</MenuItem>
+          <MenuItem value={"cancelOrderCOS_V2"}>cancelOrderCOS_V2</MenuItem>
+          <MenuItem value={"cancelTransferOrder"}>cancelTransferOrder</MenuItem>
+          <MenuItem value={"disconnectAccount_V2"}>disconnectAccount_V2</MenuItem>
+          <MenuItem value={"submitTCSROOrder_V2"}>submitTCSROOrder_V2</MenuItem>
+          <MenuItem value={"updateScheduleWindow_V2"}>updateScheduleWindow_V2</MenuItem>
+          <MenuItem value={"verifyOrder_V1"}>verifyOrder_V1</MenuItem>
         </Select>
       </FormControl>
     </Box>
