@@ -7,9 +7,11 @@ import ListItem from '@mui/material/ListItem';
 import DropDown from './DropDown'
 import TransactionInputs from './TransactionInput'
 import Table from './Table'
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
-
-const ExpandableGraph = ({ graphData,fullGraph,timeSelect }) => {
+const ExpandableGraph = ({ graphData,fullGraph,timeSelect,showConstituents }) => {
     // Tooltip
     const [hoveredNode, setHoveredNode] = useState(null);
 
@@ -26,6 +28,7 @@ const ExpandableGraph = ({ graphData,fullGraph,timeSelect }) => {
     let success;
     let rec_count;
     let exec_time;
+
 
     //Selecting which stats to display
     switch(timeSelect) {
@@ -183,7 +186,6 @@ const ExpandableGraph = ({ graphData,fullGraph,timeSelect }) => {
 
 
 
-
     if (fullGraph == "True") {
       return (
 
@@ -200,7 +202,7 @@ const ExpandableGraph = ({ graphData,fullGraph,timeSelect }) => {
               onNodeHover={handleNodeHover}
               nodeCanvasObjectMode={() => "after"}
               nodeCanvasObject={(node, ctx, globalScale) => {
-                const label = node.name;
+                const label = node.name
                 const fontSize = 12 / globalScale;
                 ctx.font = `bold ${fontSize}px Sans-Serif`;
                 ctx.textAlign = "center";
@@ -210,6 +212,8 @@ const ExpandableGraph = ({ graphData,fullGraph,timeSelect }) => {
                   ctx.fillText(label, node.x, node.y);
                 } else {
                   ctx.fillText(label, node.x + 20, node.y);
+                  if (showConstituents) {ctx.fillText(node.constituents,node.x +20 ,node.y+8)}
+
                 }
               }}
 
@@ -247,6 +251,7 @@ const ExpandableGraph = ({ graphData,fullGraph,timeSelect }) => {
           ctx.fillText(label, node.x, node.y);
         } else {
           ctx.fillText(label, node.x + 20, node.y);
+          if (showConstituents) {ctx.fillText(node.constituents,node.x +20 ,node.y+8)};
         }
       }}
 
@@ -256,29 +261,32 @@ const ExpandableGraph = ({ graphData,fullGraph,timeSelect }) => {
     );
   };
 // After demo, need to pull in Transaction data with a fetch call to nifi
-
+let GraphDataMap = new Map();
 
 import SubmitOrder_V2Data from './data/SubmitOrder_V2.json'
-import cancelOrderCOS_V2Data from './data/cancelOrderCOS_V2.json'
-// import cancelTransferOrderData from './data/cancelTransferOrder.json'
-import disconnectAccount_V2Data from './data/disconnectAccount_V2.json'
-import submitTCSROOrder_V2Data from './data/submitTCSROOrder_V2.json'
-import updateScheduleWindow_V2Data from './data/updateScheduleWindow_V2.json'
-import TransactionData from './data/32df37ae-dfa4-3130-82c9-6158fdd2880f.json'
-import TransactionData1 from './data/f07c1eef-8f97-30a0-9b19-0303f8cef757.json'
-import TransactionData2 from './data/b922d469-28ea-3438-8ce8-ab9e64ed7861.json'
-
-
-let GraphDataMap = new Map();
 GraphDataMap.set("SubmitOrder_V2",SubmitOrder_V2Data)
+
+import cancelOrderCOS_V2Data from './data/cancelOrderCOS_V2.json'
 GraphDataMap.set("cancelOrderCOS_V2", cancelOrderCOS_V2Data)
+
+// import cancelTransferOrderData from './data/cancelTransferOrder.json'
 // GraphDataMap.set("cancelTransferOrder", cancelTransferOrderData)
+
+import disconnectAccount_V2Data from './data/disconnectAccount_V2.json'
 GraphDataMap.set("disconnectAccount_V2", disconnectAccount_V2Data)
+
+import submitTCSROOrder_V2Data from './data/submitTCSROOrder_V2.json'
 GraphDataMap.set("submitTCSROOrder_V2", submitTCSROOrder_V2Data)
-GraphDataMap.set("updateScheduleWindow_V2", updateScheduleWindow_V2Data)
-GraphDataMap.set("32df37ae-dfa4-3130-82c9-6158fdd2880f", TransactionData)
-GraphDataMap.set("f07c1eef-8f97-30a0-9b19-0303f8cef757", TransactionData1)
-GraphDataMap.set("b922d469-28ea-3438-8ce8-ab9e64ed7861", TransactionData2)
+
+// import updateScheduleWindow_V2Data from './data/updateScheduleWindow_V2.json'
+// GraphDataMap.set("updateScheduleWindow_V2", updateScheduleWindow_V2Data)
+
+// import TransactionData from './data/32df37ae-dfa4-3130-82c9-6158fdd2880f.json'
+// import TransactionData1 from './data/f07c1eef-8f97-30a0-9b19-0303f8cef757.json'
+// import TransactionData2 from './data/b922d469-28ea-3438-8ce8-ab9e64ed7861.json'
+// GraphDataMap.set("32df37ae-dfa4-3130-82c9-6158fdd2880f", TransactionData)
+// GraphDataMap.set("f07c1eef-8f97-30a0-9b19-0303f8cef757", TransactionData1)
+// GraphDataMap.set("b922d469-28ea-3438-8ce8-ab9e64ed7861", TransactionData2)
 
   function GraphFunction() {
     const [showA, setShowA] = useState(true);
@@ -301,14 +309,20 @@ GraphDataMap.set("b922d469-28ea-3438-8ce8-ab9e64ed7861", TransactionData2)
     const updateTimeSelect = (newTime) => {
         setTimeSelect(newTime);
       };
+
+    const [checked, setChecked] = React.useState(true);
+    const handleChangeSwitch = (event) => {
+      setChecked(event.target.checked);
+    };
+
     const toggleComponent = () => {
       setShowA(!showA);
     };
     const ExpandedGraph = () => {
-      return (<ExpandableGraph graphData={JSON.parse(JSON.stringify(GraphDataMap.get(serviceName)))} fullGraph={"False"} timeSelect={timeSelect}/>)
+      return (<ExpandableGraph graphData={JSON.parse(JSON.stringify(GraphDataMap.get(serviceName)))} fullGraph={"False"} timeSelect={timeSelect} showConstituents={checked}/>)
     };
     const FullGraph = () => {
-      return (<ExpandableGraph graphData={JSON.parse(JSON.stringify(GraphDataMap.get(serviceName)))} fullGraph={"True"} timeSelect={timeSelect}/>)
+      return (<ExpandableGraph graphData={JSON.parse(JSON.stringify(GraphDataMap.get(serviceName)))} fullGraph={"True"} timeSelect={timeSelect} showConstituents={checked}/>)
     };
 
     return (
@@ -318,10 +332,11 @@ GraphDataMap.set("b922d469-28ea-3438-8ce8-ab9e64ed7861", TransactionData2)
 
         <p></p>
         <div style={{ display: 'flex', gap: '16px',justifyContent: 'center' }}>
-        <button onClick={toggleComponent}> {showA ? 'Expand All' : 'Collapse'}</button>
-        <DropDown updateMessage={updateServiceName} />
-        <TimeSelectDropDown updateTime={updateTimeSelect}/>
-        <TransactionInputs setTransactionId={updateTransactionid} />
+          <button onClick={toggleComponent}> {showA ? 'Expand All' : 'Collapse'}</button>
+          <DropDown updateMessage={updateServiceName} />
+          <TimeSelectDropDown updateTime={updateTimeSelect}/>
+          <TransactionInputs setTransactionId={updateTransactionid} />
+           <FormGroup><FormControlLabel control={<Switch checked={checked} onChange={handleChangeSwitch}  />} label="Constituents"/></FormGroup>
         </div>
 
 
